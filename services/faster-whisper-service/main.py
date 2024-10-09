@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import webrtcvad
 from fastapi.middleware.cors import CORSMiddleware
-
+import torch
 from scipy.signal import resample
 
 
@@ -113,8 +113,14 @@ def float2pcm(sig, dtype='int16'):
     return (sig * abs_max + offset).clip(i.min, i.max).astype(dtype)
 
 # Initialize the Whisper model for transcription
+print("Model initializing")
+# Check if CUDA is available and print the result
+if torch.cuda.is_available():
+    print("CUDA is available. Using GPU.")
+else:
+    print("CUDA is not available. Using CPU.")
 model = WhisperModel("large-v3", device="cuda", compute_type='float32')  # Assuming GPU usage; "cpu" can be used otherwise
-
+print("Model initialized")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -128,6 +134,11 @@ SAMPLE_RATE = 8000
 FRAME_DURATION_MS = 20
 FRAME_SIZE = 640  # 2 bytes per sample for 16-bit audio
 MIN_CHUNK_FRAMES = SAMPLE_RATE // (FRAME_SIZE // 2)  # Number of frames for 1 second of audio
+
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to Whisper Service"}
+
 @app.post("/complete_transcribe_r")
 async def transcribe_audio(request: Request):
     try:
@@ -252,6 +263,7 @@ async def websocket_endpoint(websocket: WebSocket):
 #             await websocket.close()
 
 # Run the application
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8002)

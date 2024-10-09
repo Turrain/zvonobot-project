@@ -1,4 +1,4 @@
-version: '3'
+
 services:
   db-service:
     build: ./services/db-service
@@ -11,24 +11,42 @@ services:
     networks:
       - backend
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3030:3030"
+  asterisk:
+    build: ./services/asterisk
     networks:
-      - frontend
-
-  whisper-server:
-    build: ./services/whisper-server
+      - backend
+    volumes:
+      - ./config:/etc/asterisk:rw
     expose:
-      - 8002           
+      - "5060"
+      - "5038"
+      - "10000-20000"
+      - "9092"
+
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3030:3030"
+  #   networks:
+  #     - frontend
+
+  faster-whisper-service:
+    build: ./services/faster-whisper-service
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all  # or specify devices like "0"
+      - HF_HUB_ENABLE_HF_TRANSFER=1
+    # expose:
+    #   - 8002
+    ports:
+      - "8002:8002"           
     networks:
       - backend
 
   asterisk-socket-service:
     build: ./services/asterisk-socket-service   
-    ports:
-      - "9092:9092"     
+    # ports:
+    #   - "9092:9092"     
     networks:
       - backend
     environment:                  
@@ -37,4 +55,4 @@ services:
 networks:
   backend:
   frontend:
-  voip:
+
