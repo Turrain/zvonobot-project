@@ -1,0 +1,40 @@
+version: '3'
+services:
+  db-service:
+    build: ./services/db-service
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    expose:
+      - 5432
+    networks:
+      - backend
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3030:3030"
+    networks:
+      - frontend
+
+  whisper-server:
+    build: ./services/whisper-server
+    expose:
+      - 8002           
+    networks:
+      - backend
+
+  asterisk-socket-service:
+    build: ./services/asterisk-socket-service   
+    ports:
+      - "9092:9092"     
+    networks:
+      - backend
+    environment:                  
+      DATABASE_URL: "postgres://user:password@db-service:5432/mydb"
+
+networks:
+  backend:
+  frontend:
+  voip:
