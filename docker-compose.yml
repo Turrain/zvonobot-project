@@ -16,12 +16,19 @@ services:
     networks:
       - backend
     volumes:
-      - ./config:/etc/asterisk:rw
+      - ./etc/asterisk:/etc/asterisk
+      - ./var/spool/asterisk:/var/spool/asterisk
+      - ./var/lib/asterisk:/var/lib/asterisk
     expose:
       - "5060"
+      - "5061"
       - "5038"
       - "10000-20000"
       - "9092"
+    network_mode: host
+    environment:
+      - ASTERISK_UID=1000
+      - ASTERISK_GID=1000
 
   # frontend:
   #   build: ./frontend
