@@ -1,0 +1,21 @@
+apps:
+  - name: faster-whisper-service
+    script: ./services/faster-whisper-service/main.py
+    cwd: ./services/faster-whisper-service
+    interpreter: ./services/faster-whisper-service/venv/bin/python
+    watch: true
+
+  - name: xtts-service
+    script: ./services/xtts-service/main.py
+    cwd: ./services/xtts-service
+    interpreter: ./services/xtts-service/venv/bin/python
+    watch: true
+
+  - name: asterisk-socket-service
+    script: go,
+    args: run main.go,
+    cwd: ./services/asterisk-socket-service
+    interpreter: none
+    watch: ["./services/asterisk-socket-service/*.go"],
+
+    

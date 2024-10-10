@@ -1,0 +1,43 @@
+
+services:
+  db-service:
+    build: ./services/db-service
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    expose:
+      - 5432
+    networks:
+      - backend
+
+  asterisk:
+    build: ./services/asterisk
+    networks:
+      - backend
+    volumes:
+      - ./etc/asterisk:/etc/asterisk
+      - ./var/spool/asterisk:/var/spool/asterisk
+      - ./var/lib/asterisk:/var/lib/asterisk
+    expose:
+      - "5060"
+      - "5061"
+      - "5038"
+      - "10000-20000"
+      - "9092"
+    network_mode: host
+    environment:
+      - ASTERISK_UID=1000
+      - ASTERISK_GID=1000
+
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3030:3030"
+  #   networks:
+  #     - frontend
+
+networks:
+  backend:
+  frontend:
+
